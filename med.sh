@@ -4,7 +4,6 @@ clear
 echo ">>>>>>>> Welcome to UITS Medicine Store <<<<<<<<<<"
 echo ""
 
-# Medicine database (name, strength, price)
 declare -A medicines=(
     [1]="Napa 120mg 15"
     [2]="Fexo 120mg 60" 
@@ -26,7 +25,6 @@ declare -a cart_prices
 total_bill=0
 order_more="y"
 
-# Function to display medicine list
 display_medicines() {
     echo " Medicine List:"
     echo "----------------------------------------------------"
@@ -40,7 +38,6 @@ display_medicines() {
     echo ""
 }
 
-# Function to add medicine to cart
 add_to_cart() {
     local choice=$1
     local name strength price
@@ -57,7 +54,7 @@ add_to_cart() {
     
     local item_total=$((quantity * price))
     
-    # Add to cart arrays
+
     cart_medicines+=("$name")
     cart_quantities+=("$quantity")
     cart_prices+=("$item_total")
@@ -70,7 +67,7 @@ add_to_cart() {
     echo ""
 }
 
-# Function to display cart
+
 display_cart() {
     if [ ${#cart_medicines[@]} -eq 0 ]; then
         echo "Your cart is empty!"
@@ -95,7 +92,7 @@ display_cart() {
     echo ""
 }
 
-# Function to generate receipt
+
 generate_receipt() {
     clear
     echo ">>>>>>>> UITS Medicine Store - Receipt <<<<<<<<<<"
@@ -110,7 +107,7 @@ generate_receipt() {
     display_cart
 }
 
-# Main program logic
+
 while [ "$order_more" = "y" ] || [ "$order_more" = "Y" ]; do
     display_medicines
     
@@ -132,13 +129,12 @@ while [ "$order_more" = "y" ] || [ "$order_more" = "Y" ]; do
     echo "Do you want to add another medicine? (y/n)"
     read order_more
     
-    # Clear screen for better UX
+
     clear
     echo ">>>>>>>> Welcome to UITS Medicine Store <<<<<<<<<<"
     echo ""
 done
 
-# Display final cart and generate receipt
 generate_receipt
 
 echo "Thanks for Your Order!"
