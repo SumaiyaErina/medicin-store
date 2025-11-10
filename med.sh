@@ -1,95 +1,149 @@
-#! /bin/bash
+#!/bin/bash
+
 clear
-echo ">>>>>>>>Welcome to UITS Medicine Store <<<<<<<<<<"
-echo " "
+echo ">>>>>>>> Welcome to UITS Medicine Store <<<<<<<<<<"
+echo ""
 
-echo " Medicine List:"
+# Medicine database (name, strength, price)
+declare -A medicines=(
+    [1]="Napa 120mg 15"
+    [2]="Fexo 120mg 60" 
+    [3]="Zimax 500mg 180"
+    [4]="Moxibac 500mg 200"
+    [5]="Terbifin 250mg 50"
+    [6]="Napa_Extra 500mg 25"
+    [7]="Seclo 20mg 8"
+    [8]="Montair 10mg 25"
+    [9]="Nexum 20mg 10"
+    [10]="Paracetamol 500mg 2"
+)
 
-echo "----Medicine Name ----Strength----Price----"
-echo "1)   Napa                 120mg    15 taka "
-echo "2)   Fexo                 120mg    60 taka "
-echo "3)   Zimax                500mg    180 taka "
-echo "4)   Moxibac              500mg    200 taka "
-echo "5)   Terbifin             250mg    50 taka "
-echo "6)   Napa Extra           500mg    25 taka "
-echo "7)   Seclo                20mg     8 taka "
-echo "8)   Montair              10mg     25 taka "
-echo "9)   Nexum                20mg     10 taka "
-echo "10)  Paracetamol          500mg    2 taka "
-echo " "
+# Arrays to store cart items
+declare -a cart_medicines
+declare -a cart_quantities
+declare -a cart_prices
 
-echo "Which Medicine Do You Want? (1-10) "
-echo " "
-read choice
+total_bill=0
+order_more="y"
 
-if ((choice == 1))
-then
-    echo "How many packs of napa 120mg do you want?"
-    read napa_q
-    price=`expr $napa_q \* 15`
+# Function to display medicine list
+display_medicines() {
+    echo " Medicine List:"
+    echo "----------------------------------------------------"
+    printf "%-3s %-15s %-12s %-10s\n" "No." "Medicine Name" "Strength" "Price"
+    echo "----------------------------------------------------"
+    for i in {1..10}; do
+        IFS=' ' read -r name strength price <<< "${medicines[$i]}"
+        printf "%-3d %-15s %-12s %-10s\n" "$i" "$name" "$strength" "$price taka"
+    done
+    echo "----------------------------------------------------"
+    echo ""
+}
 
-elif ((choice == 2))
-then
-    echo "How many packs of fexo 120mg do you want?"
-    read fexo_q
-    price=`expr $fexo_q \* 60`
+# Function to add medicine to cart
+add_to_cart() {
+    local choice=$1
+    local name strength price
+    
+    IFS=' ' read -r name strength price <<< "${medicines[$choice]}"
+    
+    echo "How many packs of $name $strength do you want?"
+    read quantity
+    
+    if [[ ! $quantity =~ ^[0-9]+$ ]] || [ $quantity -le 0 ]; then
+        echo "Invalid quantity! Please enter a positive number."
+        return
+    fi
+    
+    local item_total=$((quantity * price))
+    
+    # Add to cart arrays
+    cart_medicines+=("$name")
+    cart_quantities+=("$quantity")
+    cart_prices+=("$item_total")
+    
+    total_bill=$((total_bill + item_total))
+    
+    echo ""
+    echo "✓ Added $quantity packs of $name to your cart."
+    echo "  Item total: $item_total taka"
+    echo ""
+}
 
-elif ((choice == 3))
-then
-    echo "How many packs of Zimax 500mg (Antibiotic) do you want?"
-    read zim_q
-    price=`expr $zim_q \* 180`
+# Function to display cart
+display_cart() {
+    if [ ${#cart_medicines[@]} -eq 0 ]; then
+        echo "Your cart is empty!"
+        return
+    fi
+    
+    echo "Your Shopping Cart:"
+    echo "----------------------------------------------------"
+    printf "%-15s %-8s %-10s %-10s\n" "Medicine" "Qty" "Price" "Total"
+    echo "----------------------------------------------------"
+    
+    for i in "${!cart_medicines[@]}"; do
+        printf "%-15s %-8s %-10s %-10s\n" \
+            "${cart_medicines[$i]}" \
+            "${cart_quantities[$i]}" \
+            "${cart_prices[$i]}" \
+            "${cart_prices[$i]}"
+    done
+    
+    echo "----------------------------------------------------"
+    printf "%-15s %-8s %-10s %-10s\n" "TOTAL" "" "" "$total_bill taka"
+    echo ""
+}
 
-elif ((choice == 4))
-then
-    echo "How many packs of Moxibac 500mg (Antibiotic) do you want?"
-    read mox_q
-    price=`expr $mox_q \* 200`
+# Function to generate receipt
+generate_receipt() {
+    clear
+    echo ">>>>>>>> UITS Medicine Store - Receipt <<<<<<<<<<"
+    echo "Date: $(date)"
+    echo "----------------------------------------------------"
+    
+    if [ ${#cart_medicines[@]} -eq 0 ]; then
+        echo "No items purchased."
+        return
+    fi
+    
+    display_cart
+}
 
-elif ((choice == 5))
-then
-    echo "How many packs of Terbifin 250mg do you want?"
-    read terb_q
-    price=`expr $terb_q \* 50`
+# Main program logic
+while [ "$order_more" = "y" ] || [ "$order_more" = "Y" ]; do
+    display_medicines
+    
+    echo "Which Medicine Do You Want? (1-10, or 0 to finish)"
+    read -p "Enter your choice: " choice
+    
+    if [ "$choice" -eq 0 ]; then
+        break
+    fi
+    
+    if [[ ! $choice =~ ^[1-9]$|^10$ ]]; then
+        echo "Invalid choice! Please enter a number between 1-10."
+        echo ""
+        continue
+    fi
+    
+    add_to_cart "$choice"
+    
+    echo "Do you want to add another medicine? (y/n)"
+    read order_more
+    
+    # Clear screen for better UX
+    clear
+    echo ">>>>>>>> Welcome to UITS Medicine Store <<<<<<<<<<"
+    echo ""
+done
 
-elif ((choice == 6))
-then
-    echo "How many packs of Napa Extra 500mg do you want?"
-    read napaex_q
-    price=`expr $napaex_q \* 25`
+# Display final cart and generate receipt
+generate_receipt
 
-elif ((choice == 7))
-then
-    echo "How many packs of Seclo 20mg do you want?"
-    read seclo_q
-    price=`expr $seclo_q \* 8`
-
-elif ((choice == 8))
-then
-    echo "How many packs of Montair 10mg do you want?"
-    read montair_q
-    price=`expr $montair_q \* 25`
-
-elif ((choice == 9))
-then
-    echo "How many packs of Nexum 20mg do you want?"
-    read nexum_q
-    price=`expr $nexum_q \* 10`
-
-elif ((choice == 10))
-then
-    echo "How many packs of Paracetamol 500mg do you want?"
-    read para_q
-    price=`expr $para_q \* 2`
-
-else
-    echo "Invalid choice!"
-    price=0
-fi
-
-echo "Thanks for Your Order"
-echo " "
-
-echo "Your Total bill: $price taka"
+echo "Thanks for Your Order!"
+echo ""
+echo "Your Total bill: $total_bill taka"
 echo "Please Pay the bill and collect your medicine from the counter"
 echo "Thanks for Visiting UITS Medicine Store"
+echo ""
