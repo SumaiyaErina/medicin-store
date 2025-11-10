@@ -36,7 +36,7 @@ UITS Medicine Store is an enhanced command-line pharmacy management system that 
 1. **Make the script executable:**
 ```bash
 chmod +x medicine_store.sh
-
+```
 ## SCREENSHOT OF PROJECT
 
 <img src="img1.png">
